@@ -88,6 +88,33 @@ app.put('/usuarios/:id', async (req, res) => {
     };
 });
 
+app.get('/logs', async (req, res) => {
+    const [results] = await pool.query(
+        'SELECT * FROM armazena_logs'
+    )
+    res.send(results)
+})
+
+app.post('/logs', async (req, res) => {
+    try {
+      const { body } = req
+      const [results] = await pool.query(
+        'INSERT INTO armazena_logs(categoria, horas_trabalhadas, linha_de_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?)',
+        [body.categoria,
+        body.horas_trabalhadas,
+        body.linha_de_codigo,
+        body.bugs_corrigidos
+        ]
+    )
+    const [logCriado] = await pool.query(
+        'SELECT * FROM armazena_logs WHERE id=?', results.insertId
+    )
+    res.status(201).json(logCriado)
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta http://localhost:${PORT}`);
