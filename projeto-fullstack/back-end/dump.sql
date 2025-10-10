@@ -1,3 +1,7 @@
+//db
+CREATE DATABASE api_node;
+USE api_node;
+
 //usuario
 CREATE TABLE usuario(
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -8,7 +12,6 @@ CREATE TABLE usuario(
 );
 
 //armazena_logs
-
 CREATE TABLE armazena_logs(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	categoria TEXT,
