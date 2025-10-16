@@ -1,5 +1,6 @@
 import express from "express";
 import mysql from "mysql2/promise";
+import cors from 'cors'
 const pool = await mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -7,7 +8,13 @@ const pool = await mysql.createConnection({
     database: "devhub",
 });
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:5173', // permite requisições do frontend
+    methods: ['GET', 'POST'],
+    credentials: true
+  }))
 app.use(express.json());
+
 
 app.get("/", (req, res) => {
     res.send("Olá Mundo");
@@ -79,7 +86,7 @@ app.post("/registrar", async (req, res) => {
     try {
         const { body } = req;
         const [results] = await pool.query(
-            "INSERT INTO usuario (nome,idade, email, senha) VALUES (?,?,?,?)",
+            "INSERT INTO usuario (nome, idade, email, senha) VALUES (?,?,?,?)",
             [body.nome, body.idade, body.email, body.senha]
         );
 
