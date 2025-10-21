@@ -137,6 +137,7 @@ app.get("/logs", async (req, res) => {
         lgs.horas_trabalhadas,
         lgs.linhas_codigo,
         lgs.bugs_corrigidos,
+        lgs.id_user,
       (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
       (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments
     FROM
@@ -174,12 +175,13 @@ app.post("/logs", async (req, res) => {
     try {
         const { body } = req;
         const [results] = await pool.query(
-            "INSERT INTO lgs(categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos) VALUES (?, ?, ?, ?)",
+            "INSERT INTO lgs(categoria, horas_trabalhadas, linhas_codigo, bugs_corrigidos, id_user) VALUES (?, ?, ?, ?, ?)",
             [
                 body.categoria,
                 body.horas_trabalhadas,
                 body.linhas_codigo,
                 body.bugs_corrigidos,
+                body.id_user
             ]
         );
         const [logCriado] = await pool.query(
