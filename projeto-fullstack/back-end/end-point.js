@@ -12,7 +12,7 @@ app.use(cors({
     origin: 'http://localhost:5173', // permite requisições do frontend
     methods: ['GET', 'POST'],
     credentials: true
-  }))
+}))
 app.use(express.json());
 
 
@@ -130,11 +130,36 @@ app.get("/logs", async (req, res) => {
     const quantidade = Number(query.quantidade)
     const offset = pagina * quantidade
 
-    const [results] = await pool.query("SELECT * FROM lgs LIMIT ? OFFSET ?", [quantidade, offset]);
+    const [results] = await pool.query(`
+      SELECT
+      lgs.id,
+        lgs.categoria,
+        lgs.horas_trabalhadas,
+        lgs.linhas_codigo,
+        lgs.bugs_corrigidos,
+      (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
+      (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments
+    FROM
+      devhub.lgs 
+    left JOIN devhub.like
+    ON devhub.like.id_log = devhub.lgs.id
+    LEFT JOIN devhub.comment
+    ON devhub.comment.id_log = devhub.lgs.id
+    GROUP BY
+    lgs.id,
+      lgs.categoria,
+      lgs.horas_trabalhadas,
+      lgs.linhas_codigo,
+      lgs.bugs_corrigidos 
+    ORDER BY devhub.lgs.id asc
+      LIMIT ?
+      OFFSET ?
+    ;     `,
+        [quantidade, offset], [quantidade, offset]);
     res.send(results);
 });
 
-app.get('/logs/categoria', async(req, res) => {
+app.get('/logs/categoria', async (req, res) => {
     try {
         const [results] = await pool.query(
             'SELECT distinct(categoria) FROM lgs'
@@ -168,7 +193,7 @@ app.post("/logs", async (req, res) => {
 });
 
 //likes
-app.get('/likes', async(req, res) => {
+app.get('/likes', async (req, res) => {
     try {
         const [results] = await pool.query(
             'SELECT * FROM `like`'
@@ -179,16 +204,31 @@ app.get('/likes', async(req, res) => {
     }
 })
 
-app.post('/likes', async(req, res) => {
+app.post('/likes', async (req, res) => {
     try {
         const { body } = req;
-        const [ results ] = await pool.query(
+        const [results] = await pool.query(
             'INSERT INTO `like`(log_id, user_id) VALUES(?, ?)', [body.log_id, body.user_id]
         )
         const [likeCriado] = await pool.query(
             'SELECT * FROM `like` WHERE id=?', results.insertId
         )
         res.status(201).json(likeCriado)
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+app.delete('/likes', async (req, res) => {
+    try {
+    const { query } = req;
+    const id_log = Number(query.id_log);
+    const id_user = Number(query.id_user)
+    const results = await pool.query(
+        'DELETE FROM `like` WHERE id_log = ? AND id_user = ?', [id_log, id_user]
+    )
+        
+    res.status(200).send("Like removido!", results);
     } catch (error) {
         console.log(error)
     }
