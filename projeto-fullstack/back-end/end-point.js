@@ -29,7 +29,7 @@ app.get("/usuarios", async (req, res) => {
 app.get("/usuarios/:id", async (req, res) => {
     const { id } = req.params;
     const [results] = await pool.query(
-        "SELECT * FROM usuario WHERE idusuario=?",
+        "SELECT * FROM usuario WHERE id=?",
         id
     );
     res.send(results);
@@ -44,7 +44,7 @@ app.post("/usuarios", async (req, res) => {
         );
 
         const [usuarioCriado] = await pool.query(
-            "Select * from usuario WHERE idusuario=?",
+            "Select * from usuario WHERE id=?",
             results.insertId
         );
 
@@ -58,7 +58,7 @@ app.delete("/usuarios/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const [results] = await pool.query(
-            "DELETE FROM usuario WHERE idusuario=?",
+            "DELETE FROM usuario WHERE id=?",
             id
         );
         res.status(200).send("Usuário deletado!", results);
@@ -72,7 +72,7 @@ app.put("/usuarios/:id", async (req, res) => {
         const { id } = req.params;
         const { body } = req;
         const [results] = await pool.query(
-            "UPDATE usuario SET `nome` = ?, `idade` = ? WHERE idusuario = ?; ",
+            "UPDATE usuario SET `nome` = ?, `idade` = ? WHERE id = ?; ",
             [body.nome, body.idade, id]
         );
         res.status(200).send("Usuario atualizado", results);
@@ -91,7 +91,7 @@ app.post("/registrar", async (req, res) => {
         );
 
         const [usuarioCriado] = await pool.query(
-            "Select * from usuario WHERE idusuario=?",
+            "Select * from usuario WHERE id=?",
             results.insertId
         );
 
