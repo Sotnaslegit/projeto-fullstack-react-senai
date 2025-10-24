@@ -19,10 +19,6 @@ const Dashboard = () => {
     return (
         <>
             <div className="container">
-                <div className="pagination d-flex justify-content-around mt-3 mb-3">
-                    <button type='button' className='btn btn-danger' id='voltar'>←</button>
-                    <button type='button' className='btn btn-danger' id='avancar'>→</button>
-                </div>
                 {logs.map((item, index) => (
                     <div className="card mb-3 p-3 text-center" key={index}>
                         <p>Categoria: {item.categoria}</p>
@@ -31,10 +27,6 @@ const Dashboard = () => {
                         <p>Bugs Corrigidos: {item.bugs_corrigidos}</p>
                     </div>
                 ))}
-                <div className="pagination d-flex justify-content-around mt-3 mb-3">
-                    <button type='button' className='btn btn-danger' id='voltar'>←</button>
-                    <button type='button' className='btn btn-danger' id='avancar'>→</button>
-                </div>
             </div>
         </>
     )

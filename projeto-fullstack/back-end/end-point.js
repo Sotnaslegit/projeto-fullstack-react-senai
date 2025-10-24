@@ -194,6 +194,26 @@ app.post("/logs", async (req, res) => {
     }
 });
 
+app.get('/metricas-usuario/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [results] = await pool.query(
+            `SELECT sum(horas_trabalhadas) AS horas_trabalhadas, 
+            sum(bugs_corrigidos) AS bugs_corrigidos, 
+            count(lgs.id) AS id, 
+            sum(linhas_codigo) AS linhas_codigo, 
+            usuario.nome
+            FROM lgs
+            JOIN usuario
+            ON usuario.id = lgs.id_user
+            WHERE id_user = ?`, id
+        )
+        res.status(200).json(results)
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 //likes
 app.get('/likes', async (req, res) => {
     try {
@@ -223,14 +243,14 @@ app.post('/likes', async (req, res) => {
 
 app.delete('/likes', async (req, res) => {
     try {
-    const { query } = req;
-    const id_log = Number(query.id_log);
-    const id_user = Number(query.id_user)
-    const results = await pool.query(
-        'DELETE FROM `like` WHERE id_log = ? AND id_user = ?', [id_log, id_user]
-    )
-        
-    res.status(200).send("Like removido!", results);
+        const { query } = req;
+        const id_log = Number(query.id_log);
+        const id_user = Number(query.id_user)
+        const results = await pool.query(
+            'DELETE FROM `like` WHERE id_log = ? AND id_user = ?', [id_log, id_user]
+        )
+
+        res.status(200).send("Like removido!", results);
     } catch (error) {
         console.log(error)
     }
