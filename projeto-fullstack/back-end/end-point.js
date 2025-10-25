@@ -139,7 +139,8 @@ app.get("/logs", async (req, res) => {
         lgs.bugs_corrigidos,
         lgs.id_user,
       (SELECT COUNT(*) FROM devhub.like WHERE devhub.like.id_log = lgs.id) AS likes,
-      (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments
+      (SELECT COUNT(*) FROM devhub.comment WHERE devhub.comment.id_log = lgs.id) as qnt_comments,
+      (SELECT nome FROM usuario WHERE devhub.usuario.id = lgs.id_user) AS nome
     FROM
       devhub.lgs 
     left JOIN devhub.like
