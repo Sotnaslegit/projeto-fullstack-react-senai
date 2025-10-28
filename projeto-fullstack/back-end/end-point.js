@@ -231,7 +231,7 @@ app.post('/likes', async (req, res) => {
     try {
         const { body } = req;
         const [results] = await pool.query(
-            'INSERT INTO `like`(log_id, user_id) VALUES(?, ?)', [body.log_id, body.user_id]
+            'INSERT INTO `like`(id_log, id_user) VALUES(?, ?)', [body.id_log, body.id_user]
         )
         const [likeCriado] = await pool.query(
             'SELECT * FROM `like` WHERE id=?', results.insertId
@@ -239,6 +239,7 @@ app.post('/likes', async (req, res) => {
         res.status(201).json(likeCriado)
     } catch (error) {
         console.log(error)
+        res.status(500).json({ error: 'Erro ao salvar curtida.' });
     }
 })
 
