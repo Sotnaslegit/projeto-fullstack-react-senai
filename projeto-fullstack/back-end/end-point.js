@@ -9,10 +9,10 @@ const pool = await mysql.createConnection({
 });
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:5173', // permite requisições do frontend
-    methods: ['GET', 'POST'],
-    credentials: true
-}))
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 app.use(express.json());
 
 
@@ -243,16 +243,28 @@ app.post('/likes', async (req, res) => {
     }
 })
 
-app.delete('/likes', async (req, res) => {
+app.delete('/likes/:post_id/:id_user', async (req, res) => {
     try {
-        const { query } = req;
-        const id_log = Number(query.id_log);
-        const id_user = Number(query.id_user)
-        const results = await pool.query(
-            'DELETE FROM `like` WHERE id_log = ? AND id_user = ?', [id_log, id_user]
+        const { post_id, id_user } = req.params
+        const [results] = await pool.query(
+            'DELETE FROM `like` WHERE id_log = ? AND id_user = ?', [post_id, id_user]
         )
 
         res.status(200).send("Like removido!", results);
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+//verifica like
+app.get('/likes/:post_id/:id_user', async (req, res) => {
+    try {
+        const { post_id, id_user } = req.params
+        const [results] = await pool.query(
+            'SELECT id_user, id_log FROM `like` WHERE id_log = ? AND id_user = ?', [post_id, id_user]
+        )
+
+        res.status(200).send(results)
     } catch (error) {
         console.log(error)
     }

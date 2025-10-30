@@ -37,10 +37,52 @@ const Dashboard = () => {
                 },
                 body: JSON.stringify({ id_log: id, id_user: id_user })
             });
-    
-            setCard(prevCards => prevCards.map(item => 
-                item.id === id ? { ...item, likes: item.likes + 1 } : item
+            setCard(prevCard => prevCard.map(item => 
+                item.id === id 
+                    ? { ...item, likes: item.likes ? item.likes + 1 : 1 } 
+                    : item
             ));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function removerCurtida(id, id_user) {
+        try {
+            await fetch(`http://localhost:3000/likes/${id}/${id_user}`, {
+                method: "DELETE",
+                headers: {
+                    "content-type": "application/json",
+                    "accept": "application/json"
+                },
+                body: JSON.stringify({ id_log: id, id_user: id_user })
+            });
+            setCard(prevCard => prevCard.map(item => 
+                item.id === id 
+                    ? { ...item, likes: item.likes ? item.likes - 1 : 0 } 
+                    : item
+            ));
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function verifica_curtida(id, id_user) {
+        try {
+            const res = await fetch(`http://localhost:3000/likes/${id}/${id_user}`, {
+                method: "GET",
+                headers: {
+                    "content-type": "application/json",
+                    "accept": "application/json"
+                }
+            });
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                await curtida(id, id_user);
+            } else {
+                await removerCurtida(id, id_user);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -86,12 +128,12 @@ const Dashboard = () => {
                                         </div>
                                     </div>
                                     <div className="likecomment d-flex justify-content-around">
-                                        <p><button className='btn' onClick={() => curtida(item.id, item.id_user)}><img src={heart} alt="" width={'20px'} /></button> {item.likes}</p>
+                                        <p><button className='btn' onClick={() => verifica_curtida(item.id, item.id_user)}><img src={heart} alt="" width={'20px'} /></button> {item.likes}</p>
                                         <p><img src={comment} alt="" width={'20px'} /> {item.qnt_comments}</p>
                                     </div>
                                     <div className="comentarios d-flex w-100 justify-content-around">
                                         <input type="text" placeholder='Escreva um comentário...' className='inp w-75' />
-                                        <button className='btn'>Enviar</button>
+                                        <button className='btn'>Comentar</button>
                                     </div>
                                 </div>
                             ))}
